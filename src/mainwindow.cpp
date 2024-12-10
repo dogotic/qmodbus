@@ -52,6 +52,11 @@ MainWindow::MainWindow( QWidget * _parent ) :
 {
 	ui->setupUi(this);
 
+    ui->regTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->regTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->busMonTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->busMonTable->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
 	connect( ui->rtuSettingsWidget,   SIGNAL(serialPortActive(bool)), this, SLOT(onRtuPortActive(bool)));
 	connect( ui->asciiSettingsWidget, SIGNAL(serialPortActive(bool)), this, SLOT(onAsciiPortActive(bool)));
 	connect( ui->tcpSettingsWidget,   SIGNAL(tcpPortActive(bool)),    this, SLOT(onTcpPortActive(bool)));
@@ -178,7 +183,7 @@ void MainWindow::busMonitorAddItem( bool isRequest,
 	QTableWidgetItem * ioItem = new QTableWidgetItem( isRequest ? tr( "Req >>" ) : tr( "<< Resp" ) );
 	QTableWidgetItem * slaveItem = new QTableWidgetItem( QString::number( slave ) );
 	QTableWidgetItem * funcItem = new QTableWidgetItem( QString::number( func ) );
-	QTableWidgetItem * addrItem = new QTableWidgetItem( QString::number( addr ) );
+    QTableWidgetItem * addrItem = new QTableWidgetItem( QString::number( addr,16 ) );
 	QTableWidgetItem * numItem = new QTableWidgetItem( QString::number( nb ) );
 	QTableWidgetItem * crcItem = new QTableWidgetItem;
 	if( func > 127 )
@@ -313,7 +318,7 @@ void MainWindow::updateRequestPreview( void )
 	const int func = stringToHex( embracedString(
 						ui->functionCode->
 							currentText() ) );
-	const int addr = ui->startAddr->value();
+    const int addr = ui->startAddr->value();
 	const int num = ui->numCoils->value();
 	if( func == MODBUS_FC_WRITE_SINGLE_COIL || func == MODBUS_FC_WRITE_SINGLE_REGISTER )
 	{
@@ -345,9 +350,9 @@ void MainWindow::updateRegisterView( void )
 	const int func = stringToHex( embracedString(
 					ui->functionCode->currentText() ) );
 	const QString dataType = descriptiveDataTypeName( func );
-	const int addr = ui->startAddr->value();
+    const int addr = ui->startAddr->value();
 
-	int rowCount = 0;
+    int rowCount = 0;
 	switch( func )
 	{
 		case MODBUS_FC_WRITE_SINGLE_REGISTER:
@@ -370,8 +375,8 @@ void MainWindow::updateRegisterView( void )
 	{
 		QTableWidgetItem * dtItem = new QTableWidgetItem( dataType );
 		QTableWidgetItem * addrItem =
-			new QTableWidgetItem( QString::number( addr+i ) );
-		QTableWidgetItem * dataItem =
+            new QTableWidgetItem( QString::number( addr+i,16) );
+        QTableWidgetItem * dataItem =
 			new QTableWidgetItem( QString::number( 0 ) );
 		dtItem->setFlags( dtItem->flags() & ~Qt::ItemIsEditable	);
 		addrItem->setFlags( addrItem->flags() & ~Qt::ItemIsEditable );
@@ -511,7 +516,7 @@ void MainWindow::sendModbusRequest( void )
 					new QTableWidgetItem( dataType );
 				QTableWidgetItem * addrItem =
 					new QTableWidgetItem(
-						QString::number( addr+i ) );
+                        "0x" + QString::number( addr+i ,16) );
 				qs_num = QString::asprintf( b_hex ? "0x%04x" : "%d", data);
 				QTableWidgetItem * dataItem =
 					new QTableWidgetItem( qs_num );

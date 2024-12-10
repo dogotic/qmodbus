@@ -121,7 +121,7 @@ struct PortSettings
 };
 
 #include <QIODevice>
-#include <QMutex>
+#include <QRecursiveMutex>
 #ifdef Q_OS_UNIX
 #include <stdio.h>
 #include <termios.h>
@@ -270,7 +270,7 @@ class QEXTSERIALPORT_EXPORT QextSerialPort: public QIODevice
 #endif
 
     protected:
-        QMutex* mutex;
+        QRecursiveMutex *mutex;
         QString port;
         PortSettings Settings;
         ulong lastErr;
